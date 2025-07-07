@@ -6,12 +6,13 @@
 #include "SeeSpellAction.h"
 
 #include "Event.h"
+#include "FishWithMasterAction.h"
 #include "Formations.h"
 #include "PathGenerator.h"
 #include "Playerbots.h"
+#include "PositionValue.h"
 #include "RTSCValues.h"
 #include "RtscAction.h"
-#include "PositionValue.h"
 
 Creature* SeeSpellAction::CreateWps(Player* wpOwner, float x, float y, float z, float o, uint32 entry, Creature* lastWp,
                                     bool important)
@@ -44,6 +45,13 @@ bool SeeSpellAction::Execute(Event event)
 
     // if (!botAI->HasStrategy("RTSC", botAI->GetState()))
     //     return false;
+
+    if (spellId == FISHING_SPELL_ID)
+    {
+        FishWithMasterAction act(botAI);
+        act.Execute(Event());
+        return false;
+    }
 
     if (spellId != RTSC_MOVE_SPELL)
         return false;

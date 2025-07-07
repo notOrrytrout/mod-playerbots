@@ -73,7 +73,8 @@ enum BotState
 {
     BOT_STATE_COMBAT = 0,
     BOT_STATE_NON_COMBAT = 1,
-    BOT_STATE_DEAD = 2,
+    BOT_STATE_FISHING = 2,
+    BOT_STATE_DEAD = 3,
 
     BOT_STATE_MAX
 };
@@ -493,8 +494,7 @@ public:
     bool CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell = true, Item* itemTarget = nullptr,
                       Item* castItem = nullptr);
     bool CanCastSpell(uint32 spellid, GameObject* goTarget, bool checkHasSpell = true);
-    bool CanCastSpell(uint32 spellid, float x, float y, float z, bool checkHasSpell = true,
-                      Item* itemTarget = nullptr);
+    bool CanCastSpell(uint32 spellid, float x, float y, float z, bool checkHasSpell = true, Item* itemTarget = nullptr);
 
     bool HasAura(uint32 spellId, Unit const* player);
     Aura* GetAura(std::string const spellName, Unit* unit, bool checkIsOwner = false, bool checkDuration = false,
@@ -510,7 +510,7 @@ public:
                      bool fixed = false);
 
     uint32 GetEquipGearScore(Player* player);
-    //uint32 GetEquipGearScore(Player* player, bool withBags, bool withBank);
+    // uint32 GetEquipGearScore(Player* player, bool withBags, bool withBank);
     static uint32 GetMixedGearScore(Player* player, bool withBags, bool withBank, uint32 topN = 0);
     bool HasSkill(SkillType skill);
     bool IsAllowedCommand(std::string const text);

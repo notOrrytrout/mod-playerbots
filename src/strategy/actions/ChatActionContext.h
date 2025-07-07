@@ -22,6 +22,7 @@
 #include "DestroyItemAction.h"
 #include "DropQuestAction.h"
 #include "EquipAction.h"
+#include "FishWithMasterAction.h"
 #include "FlagAction.h"
 #include "Formations.h"
 #include "GoAction.h"
@@ -39,6 +40,7 @@
 #include "MailAction.h"
 #include "NamedObjectContext.h"
 #include "NewRpgAction.h"
+#include "OpenItemAction.h"
 #include "PassLeadershipToMasterAction.h"
 #include "PositionAction.h"
 #include "QueryItemUsageAction.h"
@@ -70,14 +72,13 @@
 #include "TradeAction.h"
 #include "TrainerAction.h"
 #include "UnequipAction.h"
+#include "UnlockItemAction.h"
+#include "UnlockTradedItemAction.h"
 #include "UseItemAction.h"
 #include "UseMeetingStoneAction.h"
 #include "WhoAction.h"
 #include "WipeAction.h"
 #include "WtsAction.h"
-#include "OpenItemAction.h"
-#include "UnlockItemAction.h"
-#include "UnlockTradedItemAction.h"
 
 class ChatActionContext : public NamedObjectContext<Action>
 {
@@ -171,6 +172,7 @@ public:
         creators["wts"] = &ChatActionContext::wts;
         creators["hire"] = &ChatActionContext::hire;
         creators["craft"] = &ChatActionContext::craft;
+        creators["fish"] = &ChatActionContext::fish_with_master;
         creators["flag"] = &ChatActionContext::flag;
         creators["give leader"] = &ChatActionContext::give_leader;
         creators["cheat"] = &ChatActionContext::cheat;
@@ -196,6 +198,7 @@ private:
     static Action* range(PlayerbotAI* botAI) { return new RangeAction(botAI); }
     static Action* flag(PlayerbotAI* botAI) { return new FlagAction(botAI); }
     static Action* craft(PlayerbotAI* botAI) { return new SetCraftAction(botAI); }
+    static Action* fish_with_master(PlayerbotAI* botAI) { return new FishWithMasterAction(botAI); }
     static Action* hire(PlayerbotAI* botAI) { return new HireAction(botAI); }
     static Action* wts(PlayerbotAI* botAI) { return new WtsAction(botAI); }
     static Action* cs(PlayerbotAI* botAI) { return new CustomStrategyEditAction(botAI); }
@@ -225,7 +228,10 @@ private:
     static Action* runaway_chat_shortcut(PlayerbotAI* botAI) { return new GoawayChatShortcutAction(botAI); }
     static Action* stay_chat_shortcut(PlayerbotAI* botAI) { return new StayChatShortcutAction(botAI); }
     static Action* follow_chat_shortcut(PlayerbotAI* botAI) { return new FollowChatShortcutAction(botAI); }
-    static Action* move_from_group_chat_shortcut(PlayerbotAI* botAI) { return new MoveFromGroupChatShortcutAction(botAI); }
+    static Action* move_from_group_chat_shortcut(PlayerbotAI* botAI)
+    {
+        return new MoveFromGroupChatShortcutAction(botAI);
+    }
     static Action* gb(PlayerbotAI* botAI) { return new GuildBankAction(botAI); }
     static Action* bank(PlayerbotAI* botAI) { return new BankAction(botAI); }
     static Action* help(PlayerbotAI* botAI) { return new HelpAction(botAI); }

@@ -8,8 +8,6 @@
 
 #include "AddLootAction.h"
 #include "AttackAction.h"
-#include "ShareQuestAction.h"
-#include "BattleGroundTactics.h"
 #include "AutoMaintenanceOnLevelupAction.h"
 #include "BattleGroundJoinAction.h"
 #include "BattleGroundTactics.h"
@@ -25,7 +23,9 @@
 #include "CombatActions.h"
 #include "DelayAction.h"
 #include "DestroyItemAction.h"
+#include "DropQuestAction.h"
 #include "EmoteAction.h"
+#include "FishWithMasterAction.h"
 #include "FollowActions.h"
 #include "GenericActions.h"
 #include "GenericSpellActions.h"
@@ -41,10 +41,10 @@
 #include "MoveToRpgTargetAction.h"
 #include "MoveToTravelTargetAction.h"
 #include "MovementActions.h"
+#include "NewRpgAction.h"
 #include "NonCombatActions.h"
 #include "OutfitAction.h"
 #include "PositionAction.h"
-#include "DropQuestAction.h"
 #include "RaidNaxxActions.h"
 #include "RandomBotUpdateAction.h"
 #include "ReachTargetActions.h"
@@ -56,13 +56,13 @@
 #include "RpgSubActions.h"
 #include "RtiAction.h"
 #include "SayAction.h"
+#include "ShareQuestAction.h"
 #include "StayActions.h"
 #include "SuggestWhatToDoAction.h"
 #include "TravelAction.h"
 #include "VehicleActions.h"
 #include "WorldBuffAction.h"
 #include "XpGainAction.h"
-#include "NewRpgAction.h"
 
 class PlayerbotAI;
 
@@ -143,6 +143,7 @@ public:
         creators["drop target"] = &ActionContext::drop_target;
         creators["check mail"] = &ActionContext::check_mail;
         creators["say"] = &ActionContext::say;
+        creators["fish with master"] = &ActionContext::fish_with_master;
         creators["reveal gathering item"] = &ActionContext::reveal_gathering_item;
         creators["outfit"] = &ActionContext::outfit;
         creators["random bot update"] = &ActionContext::random_bot_update;
@@ -217,7 +218,7 @@ public:
         creators["blade salvo"] = &ActionContext::blade_salvo;
         creators["glaive throw"] = &ActionContext::glaive_throw;
 
-        //Rpg
+        // Rpg
         creators["rpg stay"] = &ActionContext::rpg_stay;
         creators["rpg work"] = &ActionContext::rpg_work;
         creators["rpg emote"] = &ActionContext::rpg_emote;
@@ -242,7 +243,7 @@ public:
         creators["rpg mount anim"] = &ActionContext::rpg_mount_anim;
 
         creators["toggle pet spell"] = &ActionContext::toggle_pet_spell;
-        creators["pet attack"] = &ActionContext::pet_attack; 
+        creators["pet attack"] = &ActionContext::pet_attack;
 
         creators["new rpg status update"] = &ActionContext::new_rpg_status_update;
         creators["new rpg go grind"] = &ActionContext::new_rpg_go_grind;
@@ -284,7 +285,10 @@ private:
     static Action* ReachSpell(PlayerbotAI* botAI) { return new ReachSpellAction(botAI); }
     static Action* ReachMelee(PlayerbotAI* botAI) { return new ReachMeleeAction(botAI); }
     static Action* reach_party_member_to_heal(PlayerbotAI* botAI) { return new ReachPartyMemberToHealAction(botAI); }
-    static Action* reach_party_member_to_resurrect(PlayerbotAI* botAI) { return new ReachPartyMemberToResurrectAction(botAI); }
+    static Action* reach_party_member_to_resurrect(PlayerbotAI* botAI)
+    {
+        return new ReachPartyMemberToResurrectAction(botAI);
+    }
     static Action* flee(PlayerbotAI* botAI) { return new FleeAction(botAI); }
     static Action* flee_with_pet(PlayerbotAI* botAI) { return new FleeWithPetAction(botAI); }
     static Action* avoid_aoe(PlayerbotAI* botAI) { return new AvoidAoeAction(botAI); }
@@ -330,6 +334,7 @@ private:
     static Action* set_facing(PlayerbotAI* botAI) { return new SetFacingTargetAction(botAI); }
     static Action* set_behind(PlayerbotAI* botAI) { return new SetBehindTargetAction(botAI); }
     static Action* say(PlayerbotAI* botAI) { return new SayAction(botAI); }
+    static Action* fish_with_master(PlayerbotAI* botAI) { return new FishWithMasterAction(botAI); }
     static Action* reveal_gathering_item(PlayerbotAI* botAI) { return new RevealGatheringItemAction(botAI); }
     static Action* outfit(PlayerbotAI* botAI) { return new OutfitAction(botAI); }
     static Action* random_bot_update(PlayerbotAI* botAI) { return new RandomBotUpdateAction(botAI); }
@@ -377,7 +382,10 @@ private:
     // BG Tactics
     static Action* bg_tactics(PlayerbotAI* botAI) { return new BGTactics(botAI); }
     static Action* bg_move_to_start(PlayerbotAI* botAI) { return new BGTactics(botAI, "move to start"); }
-    static Action* bg_reset_objective_force(PlayerbotAI* botAI) { return new BGTactics(botAI, "reset objective force"); }
+    static Action* bg_reset_objective_force(PlayerbotAI* botAI)
+    {
+        return new BGTactics(botAI, "reset objective force");
+    }
     static Action* bg_move_to_objective(PlayerbotAI* botAI) { return new BGTactics(botAI, "move to objective"); }
     static Action* bg_select_objective(PlayerbotAI* botAI) { return new BGTactics(botAI, "select objective"); }
     static Action* bg_check_objective(PlayerbotAI* botAI) { return new BGTactics(botAI, "check objective"); }

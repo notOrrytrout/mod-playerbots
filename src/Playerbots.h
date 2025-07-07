@@ -27,6 +27,9 @@ int strcmpi(char const* s1, char const* s2);
 #define CAST_ANGLE_IN_FRONT (2.f * static_cast<float>(M_PI) / 3.f)
 #define EMOTE_ANGLE_IN_FRONT (2.f * static_cast<float>(M_PI) / 6.f)
 
+// Spell id used for fishing
+#define FISHING_SPELL_ID 131474
+
 #define GET_PLAYERBOT_AI(object) sPlayerbotsMgr->GetPlayerbotAI(object)
 #define GET_PLAYERBOT_MGR(object) sPlayerbotsMgr->GetPlayerbotMgr(object)
 
