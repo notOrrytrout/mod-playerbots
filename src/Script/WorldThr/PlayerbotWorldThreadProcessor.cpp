@@ -37,6 +37,13 @@ void PlayerbotWorldThreadProcessor::Update(uint32 diff)
     if (m_timeSinceLastUpdate < m_updateInterval)
         return;
 
+    // Skip processing when queue is empty
+    if (GetQueueSize() == 0)
+    {
+        m_timeSinceLastUpdate = 0;
+        return;
+    }
+
     m_timeSinceLastUpdate = 0;
 
     // Check queue health (warn if getting full)
