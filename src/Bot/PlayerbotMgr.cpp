@@ -784,7 +784,7 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
                 return "Initialization already in progress, please wait.";
             }
 
-            int gs;
+            int gs = 0;
             if (cmd == "init=white" || cmd == "init=common")
             {
                 PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_NORMAL);
@@ -827,11 +827,16 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
                 return "ok, gear score limit: " + std::to_string(mixedGearScore / PlayerbotAI::GetItemScoreMultiplier(ItemQualities(ITEM_QUALITY_EPIC))) +
                        "(for epic)";
             }
-            else if (cmd.starts_with("init=") && sscanf(cmd.c_str(), "init=%d", &gs) != -1)
+            else if (cmd.starts_with("init="))
             {
-                PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_LEGENDARY, gs);
-                factory.Randomize(false);
-                return "ok, gear score limit: " + std::to_string(gs / PlayerbotAI::GetItemScoreMultiplier(ItemQualities(ITEM_QUALITY_EPIC))) + "(for epic)";
+                if (sscanf(cmd.c_str(), "init=%d", &gs) == 1)
+                {
+                    PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_LEGENDARY, gs);
+                    factory.Randomize(false);
+                    return "ok, gear score limit: " + std::to_string(gs / PlayerbotAI::GetItemScoreMultiplier(ItemQualities(ITEM_QUALITY_EPIC))) + "(for epic)";
+                }
+
+                return "ERROR: invalid init gear score, expected init=<number>.";
             }
         }
 

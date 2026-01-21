@@ -4,7 +4,10 @@
  */
 
 #include "PlayerbotAIConfig.h"
+#include <cerrno>
+#include <cstdlib>
 #include <iostream>
+#include <limits>
 #include "Config.h"
 #include "NewRpgInfo.h"
 #include "PlayerbotDungeonRepository.h"
@@ -16,34 +19,51 @@
 #include "RandomPlayerbotMgr.h"
 #include "Talentspec.h"
 
+bool TryParseUint32(std::string const& token, uint32& value)
+{
+    if (token.empty())
+        return false;
+
+    char* end = nullptr;
+    errno = 0;
+    unsigned long parsed = strtoul(token.c_str(), &end, 10);
+    if (errno != 0 || end == token.c_str() || *end != '\0' || parsed > std::numeric_limits<uint32>::max())
+        return false;
+
+    value = static_cast<uint32>(parsed);
+    return true;
+}
+
 template <class T>
-void LoadList(std::string const value, T& list)
+void LoadList(std::string const& value, T& list)
 {
     std::vector<std::string> ids = split(value, ',');
     for (std::vector<std::string>::iterator i = ids.begin(); i != ids.end(); i++)
     {
-        uint32 id = atoi((*i).c_str());
-        // if (!id)
-        //     continue;
+        uint32 id = 0;
+        if (!TryParseUint32(*i, id))
+            continue;
+
         list.push_back(id);
     }
 }
 
 template <class T>
-void LoadSet(std::string const value, T& set)
+void LoadSet(std::string const& value, T& set)
 {
     std::vector<std::string> ids = split(value, ',');
     for (std::vector<std::string>::iterator i = ids.begin(); i != ids.end(); i++)
     {
-        uint32 id = atoi((*i).c_str());
-        // if (!id)
-        //     continue;
+        uint32 id = 0;
+        if (!TryParseUint32(*i, id))
+            continue;
+
         set.insert(id);
     }
 }
 
 template <class T>
-void LoadListString(std::string const value, T& list)
+void LoadListString(std::string const& value, T& list)
 {
     std::vector<std::string> strings = split(value, ',');
     for (std::vector<std::string>::iterator i = strings.begin(); i != strings.end(); i++)
@@ -116,6 +136,7 @@ bool PlayerbotAIConfig::Initialize()
     saveManaThreshold = sConfigMgr->GetOption<int32>("AiPlayerbot.SaveManaThreshold", 60);
     autoAvoidAoe = sConfigMgr->GetOption<bool>("AiPlayerbot.AutoAvoidAoe", true);
     maxAoeAvoidRadius = sConfigMgr->GetOption<float>("AiPlayerbot.MaxAoeAvoidRadius", 15.0f);
+    aoeAvoidSpellWhitelist.clear();
     LoadSet<std::set<uint32>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.AoeAvoidSpellWhitelist", "50759,57491,13810,29946"),
                               aoeAvoidSpellWhitelist);
     tellWhenAvoidAoe = sConfigMgr->GetOption<bool>("AiPlayerbot.TellWhenAvoidAoe", false);
@@ -139,6 +160,7 @@ bool PlayerbotAIConfig::Initialize()
     randomBotInvitePlayer = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotInvitePlayer", false);
     inviteChat = sConfigMgr->GetOption<bool>("AiPlayerbot.InviteChat", false);
 
+    randomBotMaps.clear();
     randomBotMapsAsString = sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotMaps", "0,1,530,571");
     LoadList<std::vector<uint32>>(randomBotMapsAsString, randomBotMaps);
     probTeleToBankers = sConfigMgr->GetOption<float>("AiPlayerbot.ProbTeleToBankers", 0.25f);
@@ -153,26 +175,32 @@ bool PlayerbotAIConfig::Initialize()
     weightTeleToSilvermoonCity = sConfigMgr->GetOption<int>("AiPlayerbot.TeleToSilvermoonCityWeight", 1);
     weightTeleToShattrathCity = sConfigMgr->GetOption<int>("AiPlayerbot.TeleToShattrathCityWeight", 1);
     weightTeleToDalaran = sConfigMgr->GetOption<int>("AiPlayerbot.TeleToDalaranWeight", 1);
+    randomBotQuestItems.clear();
     LoadList<std::vector<uint32>>(
         sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotQuestItems",
                                            "5175,5176,5177,5178,6948,11000,12382,13704,16309"),
         randomBotQuestItems);
+    randomBotSpellIds.clear();
     LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotSpellIds", "54197"),
                                   randomBotSpellIds);
+    pvpProhibitedZoneIds.clear();
     LoadList<std::vector<uint32>>(
         sConfigMgr->GetOption<std::string>("AiPlayerbot.PvpProhibitedZoneIds",
                                            "2255,656,2361,2362,2363,976,35,2268,3425,392,541,1446,3828,3712,3738,3565,"
                                            "3539,3623,4152,3988,4658,4284,4418,4436,4275,4323,4395,3703,4298,3951"),
         pvpProhibitedZoneIds);
+    pvpProhibitedAreaIds.clear();
     LoadList<std::vector<uint32>>(
         sConfigMgr->GetOption<std::string>("AiPlayerbot.PvpProhibitedAreaIds",
                                            "976,35,392,2268,4161,4010,4317,4312,3649,3887,3958,3724,4080,3938,3754,3786,3973"),
         pvpProhibitedAreaIds);
     fastReactInBG = sConfigMgr->GetOption<bool>("AiPlayerbot.FastReactInBG", true);
+    randomBotQuestIds.clear();
     LoadList<std::vector<uint32>>(
         sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotQuestIds", "3802,5505,6502,7761,7848,10277,10285,11492,13188,13189,24499,24511,24710,24712"),
         randomBotQuestIds);
 
+    disallowedGameObjects.clear();
     LoadSet<std::set<uint32>>(
         sConfigMgr->GetOption<std::string>("AiPlayerbot.DisallowedGameObjects",
                                            "176213,17155,2656,74448,19020,3719,3658,3705,3706,105579,75293,2857,"
@@ -211,6 +239,7 @@ bool PlayerbotAIConfig::Initialize()
     randomBotJoinLfg = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotJoinLfg", true);
 
     restrictHealerDPS = sConfigMgr->GetOption<bool>("AiPlayerbot.HealerDPSMapRestriction", false);
+    restrictedHealerDPSMaps.clear();
     LoadList<std::vector<uint32>>(
         sConfigMgr->GetOption<std::string>("AiPlayerbot.RestrictedHealerDPSMaps",
                                              "33,34,36,43,47,48,70,90,109,129,209,229,230,329,349,389,429,1001,1004,"
@@ -501,8 +530,10 @@ bool PlayerbotAIConfig::Initialize()
     if (std::find(botCheats.begin(), botCheats.end(), "raid") != botCheats.end())
         botCheatMask |= (uint32)BotCheatMask::raid;
 
+    allowedLogFiles.clear();
     LoadListString<std::vector<std::string>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.AllowedLogFiles", ""),
                                              allowedLogFiles);
+    tradeActionExcludedPrefixes.clear();
     LoadListString<std::vector<std::string>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.TradeActionExcludedPrefixes", ""),
                                              tradeActionExcludedPrefixes);
 
