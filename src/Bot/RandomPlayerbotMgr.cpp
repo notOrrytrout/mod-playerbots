@@ -445,34 +445,37 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
         AddRandomBots();
     }
 
-    if (sPlayerbotAIConfig->syncLevelWithPlayers && !players.empty())
+    if (onlineBotCount > 0)
     {
-        if (time(nullptr) > (PlayersCheckTimer + 60))
-            sRandomPlayerbotMgr->CheckPlayers();
-    }
-
-    if (sPlayerbotAIConfig->randomBotJoinBG /* && !players.empty()*/)
-    {
-        if (time(nullptr) > (BgCheckTimer + 35))
-            sRandomPlayerbotMgr->CheckBgQueue();
-    }
-
-    if (sPlayerbotAIConfig->randomBotJoinLfg /* && !players.empty()*/)
-    {
-        if (time(nullptr) > (LfgCheckTimer + 30))
-            sRandomPlayerbotMgr->CheckLfgQueue();
-    }
-
-    if (sPlayerbotAIConfig->randomBotAutologin && time(nullptr) > (printStatsTimer + 300))
-    {
-        if (!printStatsTimer)
+        if (sPlayerbotAIConfig->syncLevelWithPlayers && !players.empty())
         {
-            printStatsTimer = time(nullptr);
+            if (time(nullptr) > (PlayersCheckTimer + 60))
+                sRandomPlayerbotMgr->CheckPlayers();
         }
-        else
+
+        if (sPlayerbotAIConfig->randomBotJoinBG /* && !players.empty()*/)
         {
-            sRandomPlayerbotMgr->PrintStats();
-            // activatePrintStatsThread();
+            if (time(nullptr) > (BgCheckTimer + 35))
+                sRandomPlayerbotMgr->CheckBgQueue();
+        }
+
+        if (sPlayerbotAIConfig->randomBotJoinLfg /* && !players.empty()*/)
+        {
+            if (time(nullptr) > (LfgCheckTimer + 30))
+                sRandomPlayerbotMgr->CheckLfgQueue();
+        }
+
+        if (sPlayerbotAIConfig->randomBotAutologin && time(nullptr) > (printStatsTimer + 300))
+        {
+            if (!printStatsTimer)
+            {
+                printStatsTimer = time(nullptr);
+            }
+            else
+            {
+                sRandomPlayerbotMgr->PrintStats();
+                // activatePrintStatsThread();
+            }
         }
     }
     uint32 updateBots = sPlayerbotAIConfig->randomBotsPerInterval * onlineBotFocus / 100;
